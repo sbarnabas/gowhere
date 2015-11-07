@@ -35,3 +35,8 @@ def sitemap():
 def warmup():
     # TODO: put your warmup code here
     return 'success'
+
+
+@app.route('/dashboard')
+def dashboard():
+    return flask.render_template('dashboard.html', html_class='dashboard')

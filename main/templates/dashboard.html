@@ -1,0 +1,33 @@
+# extends 'base.html'
+
+# block header
+  <div class="jumbotron">
+    <div class="container">
+      <h1>Dashboard</h1>
+    </div>
+  </div>
+<link rel="stylesheet" href="http://css-spinners.com/css/spinner/dots.css" type="text/css">
+<script type="text/javascript"
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKV2f9z9VowNDm5OFdWHy_Dk6Qryn47k4&libraries=visualization">
+</script>
+ <script type="text/javascript">
+
+ </script>
+ # endblock
+
+# block content
+ <div class="row">
+ <div class="col-md-12"> 
+ <h1>Transaction Data for <span id="data-date">Today</span></h1>
+ <div id="map" class="col-md-8" style="height:480px">
+  <div class="col-md-3"></div>
+  <div class="dots-loader" style="margin-top:200px">
+   Loading…
+    </div>
+    <div>
+    Loading...
+    </div>
+  </div>
+ </div>
+ </div>
+# endblock

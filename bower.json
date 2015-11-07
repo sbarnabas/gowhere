@@ -5,14 +5,22 @@
     "font-awesome": "~4",
     "jquery": "~2",
     "moment": "~2",
-    "nprogress": "https://github.com/lipis/nprogress.git#master"
+    "nprogress": "https://github.com/lipis/nprogress.git#master",
+    "angular": "~1.4.7"
   },
   "overrides": {
     "bootstrap": {
-      "main": ["less/**", "fonts/*", "js/*"]
+      "main": [
+        "less/**",
+        "fonts/*",
+        "js/*"
+      ]
     },
     "font-awesome": {
-      "main": ["less/*", "fonts/*"]
+      "main": [
+        "less/*",
+        "fonts/*"
+      ]
     }
   }
 }
