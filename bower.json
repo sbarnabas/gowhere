@@ -6,7 +6,8 @@
     "jquery": "~2",
     "moment": "~2",
     "nprogress": "https://github.com/lipis/nprogress.git#master",
-    "angular": "~1.4.7"
+    "angular": "~1.4.7",
+    "bootstrap-toggle": "~2.2.1"
   },
   "overrides": {
     "bootstrap": {

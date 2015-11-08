@@ -1,33 +1,61 @@
 # extends 'base.html'
-
 # block header
-  <div class="jumbotron">
-    <div class="container">
-      <h1>Dashboard</h1>
-    </div>
-  </div>
+
 <link rel="stylesheet" href="http://css-spinners.com/css/spinner/dots.css" type="text/css">
 <script type="text/javascript"
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKV2f9z9VowNDm5OFdWHy_Dk6Qryn47k4&libraries=visualization">
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKV2f9z9VowNDm5OFdWHy_Dk6Qryn47k4&libraries=visualization">
 </script>
- <script type="text/javascript">
-
- </script>
- # endblock
-
+<script type="text/javascript">
+</script>
+# endblock
 # block content
- <div class="row">
- <div class="col-md-12"> 
- <h1>Transaction Data for <span id="data-date">Today</span></h1>
- <div id="map" class="col-md-8" style="height:480px">
-  <div class="col-md-3"></div>
-  <div class="dots-loader" style="margin-top:200px">
-   Loading…
+<div class="row">
+  <div class="col-md-12">
+    <h2>Transaction Data for <span class="dropdown">
+  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    <h3>Today</h3>
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="#">Yesterday</a></li>
+    <li><a href="#">Last Week</a></li>
+    <li><a href="#">Month to Date</a></li>
+    <li><a href="#">Year to Date</a></li>
+    <li><a href="#">All</a></li>
+  </ul>
+</span></h2>
+  </div>
+  <div id="map" class="col-md-8" style="height:480px">
+    <div class="col-md-3"></div>
+    <div class="dots-loader" style="margin-top:200px">
+      Loading…
     </div>
     <div>
-    Loading...
+      Loading...
     </div>
   </div>
- </div>
- </div>
+  <div class="col-md-4">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Info </h3>
+      </div>
+      <div class="panel-body" id="infopanel">
+   Select an item for more information </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Display Options</h3>
+      </div>
+      <table class="table">
+       
+      <tr><td>Show Competitors</td><td>  <input type="checkbox" id="showCompetitors"  data-toggle="toggle"></td></tr>
+      <tr><td>Show Events</td><td>  <input type="checkbox"  id="showEvents" data-toggle="toggle"></td></tr>
+    </table>
+  </div>
+</div>
+</div>
 # endblock

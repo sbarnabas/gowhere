@@ -1,95 +1,154 @@
-$(document).ready(function() {
-if(typeof google !="undefined") {
-/* Data points defined as an array of LatLng objects */
-var heatmapData;
+$(document)
+    .ready(function () {
+        if (typeof google != "undefined") {
+            /* Data points defined as an array of LatLng objects */
+            var heatmapData;
+            var transactionData = {
+                getData: function () {
+                    return $.getJSON("/p/data/transactions.json", parseTransactionResponse);
+                }
+            }
 
-var transactionData = {
-	getData: function() {
+            var eventData = {
+            	getData: function() {
+            		return $.getJSON("/p/data/events.json",parseEventResponse);
+            	}
+            }
+            var evts= [];
+            var transactions = [];
+            var competitors = [];
+            var nearbyEvents = [];
+            var merchantData = {
+                getData: function () {
+                    var urls = [
+                        //"http://dmartin.org:8026/merchantpoi/v1/merchantpoisvc.svc/merchantpoi?MCCCode=5812&postalCode=10013&format=json",
+                        //"http://dmartin.org:8026/merchantpoi/v1/merchantpoisvc.svc/merchantpoi?MCCCode=5814&postalCode=10013&format=json",
+                        "/p/data/5812.json"
+                    ];
+                    for (var idx in urls) {
+                        $.getJSON(urls[idx], parseMerchantResponse);
+                    }
+                }
+            }
+            $("#showCompetitors")
+                .change(function () {
+                    if (this.checked) {
+                        $.each(competitors, function (idx, obj) {
+                            obj.setMap(map);
+                        });
+                    } else {
+                        $.each(competitors, function (idx, obj) {
+                            obj.setMap(null);
+                        });
+                    }
+                });
 
-		return [
-  {location:new google.maps.LatLng(40.719893, -74.001717),weight:5.25},
-  {location:new google.maps.LatLng(40.719893, -74.001717),weight:1.25},
-  {location:new google.maps.LatLng(40.719893, -74.001717),weight:6.25},
-  {location:new google.maps.LatLng(40.719893, -74.001717),weight:2.25},
-  {location:new google.maps.LatLng(40.719893, -74.001717),weight:4.25},
-  {location:new google.maps.LatLng(40.719893, -74.001717),weight:3.25},
-  {location:new google.maps.LatLng(40.719893, -74.001717),weight:0.25},
- 
-   {location:new google.maps.LatLng(40.716722, -74.004395),weight:2.25},
-];
-	}
-}
+            function displayMerchantInfo(data) {
+                var elem = $("<div></div>")
+                    .append($("<b></b>")
+                        .text(data.CleansedMerchantName), $("<p></p>")
+                        .text(data.CleansedMerchantStreetAddress), $("<p></p>")
+                        .text(data.CleansedMerchantTelephoneNumber));
+                $("#infopanel")
+                    .html(elem);
+            }
 
-var merchantData = {
-	getData: function() {
-		var urls = 
-		[
-"http://dmartin.org:8026/merchantpoi/v1/merchantpoisvc.svc/merchantpoi?MCCCode=5812&postalCode=10013&format=json",
-"http://dmartin.org:8026/merchantpoi/v1/merchantpoisvc.svc/merchantpoi?MCCCode=5814&postalCode=10013&format=json",
-];
-	
-	for(var idx in urls) {
-		$.getJSON(urls[idx],parseMerchantResponse);
-	}
+            function parseTransactionResponse(data) {
+                $.each(data.transactions, function (idx, obj) {
+                    transactions.push({
+                        location: new google.maps.LatLng(obj.lat, obj.lng),
+                        weight: obj.amount / 100
+                    });
+                });
+                console.dir(transactions);
+            }
+              var openWindow;
+            function parseMerchantResponse(data) {
+                console.dir(data);
+              
+                $.each(data.MerchantPOIList.MerchantPOIArray.MerchantPOI, function (idx, obj) {
+                    var infowindow = new google.maps.InfoWindow({
+                        content: obj.CleansedMerchantName
+                    });
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(obj.Latitude, obj.Longitude),
+                        map: null,
+                        title: obj.CleansedMerchantName,
+                    });
+                    google.maps.event.addListener(marker, 'click', function () {
+                        if (openWindow) {
+                            openWindow.close();
+                        }
+                        infowindow.open(map, marker);
+                        openWindow = infowindow;
+                        displayMerchantInfo(obj);
+                    });
+                    competitors.push(marker);
+                });
+            }
+            function parseEventResponse(data) {
+            	
+            }
+            var myPos;
+            var map;
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    myPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                    map = new google.maps.Map(document.getElementById('map'), {
+                        center: myPos,
+                        zoom: 15,
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                    });
+                    //load transaction data
+                    transactionData.getData()
+                        .done(function () {
+                            console.log(transactions);
+                            var heatmap = new google.maps.visualization.HeatmapLayer({
+                                data: transactions
+                            });
+                            heatmap.set('radius', 40);
+                            heatmap.setMap(map);
+                            merchantData.getData();
+                            console.log("Done Loading data");
+                        });
+                    eventData.getData().done(function() { console.log("loaded event data");})
 
-	}
-}
-function parseMerchantResponse(data) {
-	console.dir(data);
-	$.each(
-	data.MerchantPOIList.MerchantPOIArray.MerchantPOI,
-	function(idx,obj) {
-		 var infowindow = new google.maps.InfoWindow({
-      content:  obj.CleansedMerchantName
+                    })
+                })
+                //load merchant data for 5811,5812,5813,5814 as competitors
+            }
+            //load events nearby today
+        } else if (jQuery()
+            .dataTable) {
+            console.log('transactions');
+            $('#transaction')
+                .DataTable({
+                    ajax: {
+                        url: '/p/data/transactions.json',
+                        dataSrc: 'transactions',
+                    },
+                    columns: [{
+                        data: "timestamp"
+                    }, {
+                        data: "amount"
+                    }, {
+                        data: "lat"
+                    }, {
+                        data: "lng"
+                    }, ],
+                    "columnDefs": [{
+                        // The `data` parameter refers to the data for the cell (defined by the
+                        // `data` option, which defaults to the column being worked with, in
+                        // this case `data: 0`.
+                        "render": function (data, type, row) {
+                            return data + ', ' + row["lng"];
+                        },
+                        "targets": 2
+                    }, {
+                        "visible": false,
+                        "targets": [3]
+                    }]
+                });
+        }
     });
-		var marker = new google.maps.Marker({
-    position: new google.maps.LatLng(obj.Latitude,obj.Longitude),
-    map: map,
-    title: obj.CleansedMerchantName,
-  });
-		google.maps.event.addListener(marker, 'click', function() {
-      infowindow.open(map,marker);
-    });
-	});
-	
-
-}
-
-var myPos;
-if("geolocation" in navigator) {
-	navigator.geolocation.getCurrentPosition(function(position) {
-  myPos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-  map = new google.maps.Map(document.getElementById('map'), {
-  center: myPos,
-  zoom: 15,
-  mapTypeId: google.maps.MapTypeId.ROADMAP
-});
-//load transaction data
-var loadTransaction = $.Deferred();
-loadTransaction.promise(transactionData);
-
-transactionData.done(function() {
-
-var heatmap = new google.maps.visualization.HeatmapLayer({
-  data: transactionData.getData()
-});
-  heatmap.set('radius',40);
-  heatmap.setMap(map);
-  console.log("Done Loading data");
-});
-
-loadTransaction.resolve();
-})
-
-//load merchant data for 5811,5812,5813,5814 as competitors
-merchantData.getData();
-
-}
-
-//load events nearby today
-
-
-}
-});
-console.log('Loaded');
-
+console.log('Loaded'); {}
