@@ -3,19 +3,18 @@ import wtforms
 import flask
 import auth
 import model
-import simplify
 from main import app
-
-simplify.public_key = ""
-simplify.private_key = ""
 
 
 class AddTransactionForm(wtf.Form):
     name = wtforms.StringField('Name', [wtforms.validators.required()])
     card = wtforms.StringField(
-        'Card Number', [wtforms.validators.required(), ])
-    phone = wtforms.StringField('Phone', [wtforms.validators.optional()])
-    address = wtforms.TextAreaField('Address', [wtforms.validators.optional()])
+        'Card Number', [wtforms.validators.required()])
+    month = wtforms.IntegerField(
+        'Expiration Month', [wtforms.validators.required()])
+    year = wtforms.IntegerField(
+        'Expiration Year', [wtforms.validators.required()])
+    cvc = wtforms.IntegerField('CVC', [wtforms.validators.required()])
 
 
 @app.route('/transaction/create/', methods=['GET', 'POST'])
@@ -25,10 +24,7 @@ def transaction_create():
     if form.validate_on_submit():
         transaction_db = model.transaction(
             user_key=auth.current_user_key(),
-            name=form.name.data,
-            email=form.email.data,
-            phone=form.phone.data,
-            address=form.address.data,
+
         )
         transaction_db.put()
         return flask.redirect(flask.url_for('welcome'))
